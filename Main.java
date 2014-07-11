@@ -4,33 +4,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-	public static String chord(Scanner scan) {
-		String in = scan.nextLine();
+	static int numberStrings;
+
+	public static String barline(int n) {
 		String out = "";
-		for (int i = 7; i > in.length(); i--) {
-			out += "-\n";
-		}
-		for (int i = in.length() - 1; i >= 0; i--) {
-			if (in.charAt(i) == '-') {
-				out += "-\n";
-			}
-			else {
-				out += Integer.toString((int) in.charAt(i) - 'a') + "\n";
-			}
+		for (int i = 0; i < n; i++) {
+			out += "|\n";
 		}
 		return out;
 	}
 
 	public static String note(String in) {
 		String out = "";
-		Pattern pattern = Pattern.compile("[0-7][a-p]");
+		Pattern pattern = Pattern.compile("[0-9][a-p]");
 		Matcher matcher = pattern.matcher(in);
 		ArrayList<String> toks = new ArrayList<String>();
 		while (matcher.find()) {
 			toks.add(matcher.group());
 		}
 
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < numberStrings; i++) {
 			boolean empty = true;
 			for (String s : toks) {
 				if ((int) s.charAt(0) - '0' == i + 1) {
@@ -49,29 +42,28 @@ public class Main {
 		String[] s1tok = s1.split("\n");
 		String[] s2tok = s2.split("\n");
 		String out = "";
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < numberStrings; i++) {
 			if (i < s1tok.length) {
-				out += s1tok[i] + "-";
-			} else {
-				out += "-";
+				out += s1tok[i];
 			}
+			out += "-";
 			if (i < s2tok.length) {
-				out += s2tok[i] + "-";
-			} else {
-				out += "-";
+				out += s2tok[i];
 			}
-			out += "\n";
+			out += "-\n";
 		}
 		return out;
 	}
 		
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
-		String total = "";
+		numberStrings = Integer.parseInt(in.nextLine());
+		String barline = barline(numberStrings);
+		String total = barline;
 		while (in.hasNext()) {
 			String line = in.nextLine();
-			if (line.charAt(0) == '.') {
-				total = sum(total, chord(in));
+			if (line.charAt(0) == ',') {
+				total = sum(total, barline);
 			}
 			else {
 				total = sum(total, note(line));
