@@ -15,13 +15,13 @@ First line of input is the number of strings in the original tablature.
 Subsequent lines consist of note and duration parameters in the following format:
 
 (Note)			(Duration)
-<String#><Letter>	[<Fraction>] [.]
+StringLetter		[<Fraction>] [.]
 
 Example:
 
 3a	1/8 .
 
-(Reads as: third string, fret a (open string), with a duration of an eighth note)
+(Reads as: third string, fret a (open string), dotted eighth note duration)
 
 Note and duration parameters are separated by a tab ('\t') character.
 The dot ('.') and fraction are separated by a space (' ') character.
