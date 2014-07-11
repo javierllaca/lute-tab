@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-	static int numberStrings;
+	static int stringNumber;
 
 	public static String barline(int n) {
 		String out = "";
@@ -23,7 +23,7 @@ public class Main {
 			toks.add(matcher.group());
 		}
 
-		for (int i = 0; i < numberStrings; i++) {
+		for (int i = 0; i < stringNumber; i++) {
 			boolean empty = true;
 			for (String s : toks) {
 				if ((int) s.charAt(0) - '0' == i + 1) {
@@ -42,7 +42,7 @@ public class Main {
 		String[] s1tok = s1.split("\n");
 		String[] s2tok = s2.split("\n");
 		String out = "";
-		for (int i = 0; i < numberStrings; i++) {
+		for (int i = 0; i < stringNumber; i++) {
 			if (i < s1tok.length) {
 				out += s1tok[i];
 			}
@@ -50,15 +50,15 @@ public class Main {
 			if (i < s2tok.length) {
 				out += s2tok[i];
 			}
-			out += "-\n";
+			out += "\n";
 		}
 		return out;
 	}
 		
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
-		numberStrings = Integer.parseInt(in.nextLine());
-		String barline = barline(numberStrings);
+		stringNumber = Integer.parseInt(in.nextLine());
+		String barline = barline(stringNumber);
 		String total = barline;
 		while (in.hasNext()) {
 			String line = in.nextLine();
