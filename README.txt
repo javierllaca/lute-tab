@@ -2,7 +2,7 @@ Lute tablature converter
 By Javier Llaca
 ------------------------
 
-Converts alphabetic renaissance lute tablature to numeric tablature.
+Converts French lute tablature to numeric tablature.
 
 
 
