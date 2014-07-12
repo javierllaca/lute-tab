@@ -4,8 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-	static int stringNumber;
+	static int numberStrings;
 	static boolean convert;
+	static Pattern pattern = Pattern.compile("[0-9][a-z]");
 
 	public static String barline(int n) {
 		String out = " \n";
@@ -16,42 +17,47 @@ public class Main {
 	}
 
 	public static String parseDuration(String str) {
-		String out = " ";
+		String duration = " ";
 		int number = Integer.parseInt(str.substring(str.indexOf("/") + 1).replace(".", ""));
 		switch (number) {
-			case 1: out += "w"; break;
-			case 2: out += "h"; break;
-			case 4: out += "q"; break;
-			case 8: out += "e"; break;
-			case 16: out += "s"; break;
-			case 32: out += "t"; break;
+			case 1: duration += "w"; break;
+			case 2: duration += "h"; break;
+			case 4: duration += "q"; break;
+			case 8: duration += "e"; break;
+			case 16: duration += "s"; break;
+			case 32: duration += "t"; break;
 		}
-		out += (str.charAt(str.length() - 1) == '.') ? "." : " ";
-		return out;
+		duration += (str.charAt(str.length() - 1) == '.') ? "." : " ";
+		return duration;
+	}
+
+	public static String match(ArrayList<String> matches, int i) {
+		for (String match : matches) {
+			if (i == (int) match.charAt(0) - '0') {
+				return match;
+			}
+		}
+		return null;
 	}
 
 	public static String parseNotes(String in) {
 		String result = "";
 
-		Pattern pattern = Pattern.compile("[0-9][a-z]");
 		Matcher matcher = pattern.matcher(in);
 		ArrayList<String> pairs = new ArrayList<String>();
 		while (matcher.find()) {
 			pairs.add(matcher.group());
 		}
 
-		for (int i = 0; i < stringNumber; i++) {
-			boolean activeString = false;
-			for (String pair : pairs) {
-				if (i + 1 == (int) pair.charAt(0) - '0') {
-					activeString = true;
-					String fret = convert ? 
-						Integer.toString((int) pair.charAt(1) - 'a') : 
-						Character.toString(pair.charAt(1));
-					result += "-" + fret + "-\n";
-				}
+		for (int i = 0; i < numberStrings; i++) {
+			String match = match(pairs, i + 1);
+			if (match != null) {
+				String fret = convert ? 
+					Integer.toString((int) match.charAt(1) - 'a') : 
+					Character.toString(match.charAt(1));
+				result += "-" + fret + "-\n";
 			}
-			if (!activeString) {
+			else {
 				result += "---\n";
 			}
 		}
@@ -84,11 +90,11 @@ public class Main {
 		String[] rows = tab.split("\n");
 		String result = "", remaining = "";
 
-		if (rows[1].length() <= charLength) {
+		if (rows[1].length() < charLength) {
 			return tab;
 		}
 
-		int index = rows[1].indexOf("|", charLength);
+		int index = rows[1].substring(0, charLength).lastIndexOf('|');
 		for (String row : rows) {
 			result += row.substring(0, index + 1) + "\n";
 			remaining += row.substring(index) + "\n";
@@ -97,18 +103,12 @@ public class Main {
 
 		return result + splitRows(remaining, charLength);
 	}
-		
-	public static void main(String[] args) {
-		if (args.length > 0 && args[0].charAt(1) == 'c') {
-			convert = true;
-		} else {
-			convert = false;
-		}
-		
+
+	public static String parseTab() {
 		Scanner in = new Scanner(System.in);
 
-		stringNumber = Integer.parseInt(in.nextLine());
-		String barline = barline(stringNumber);
+		numberStrings = Integer.parseInt(in.nextLine());
+		String barline = barline(numberStrings);
 		String tab = barline;
 
 		while (in.hasNext()) {
@@ -120,6 +120,26 @@ public class Main {
 				tab = mergeTabs(tab, tabColumn(line));
 			}
 		}
-		System.out.println(splitRows(tab, 70));
+		return tab;
+	}
+		
+	public static void main(String[] args) {
+		if (args.length > 0 && args[0].charAt(1) == 'c') {
+			convert = true;
+		} else {
+			convert = false;
+		}
+		
+		String tab = parseTab();
+
+		if (args.length > 1 && args[1].charAt(1) == 't') {
+			if (args.length > 2) {
+				System.out.println(splitRows(tab, Integer.parseInt(args[2])));
+			} else {
+				System.out.println(splitRows(tab, 80));
+			}
+		} else {
+			System.out.println(tab);
+		}
 	}
 }
