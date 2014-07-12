@@ -2,10 +2,7 @@ Lute tablature converter
 By Javier Llaca
 ------------------------
 
-Converts alphabetic lute tablature to numeric tablature.
-
-The program currently supports tablature for instruments with no
-more than 9 strings.
+Converts alphabetic renaissance lute tablature to numeric tablature.
 
 
 
@@ -15,24 +12,23 @@ First line of input is the number of strings in the original tablature.
 Subsequent lines consist of note and duration parameters in the following format:
 
 (Note)			(Duration)
-StringLetter		[<Fraction>] [.]
+StringLetter		[<Fraction>][.]
 
 Example:
 
-3a	1/8 .
-
-(Reads as: third string, fret a (open string), dotted eighth note duration)
+3a	1/8.
+(third string, fret a (open string), dotted eighth note duration)
 
 Note and duration parameters are separated by a tab ('\t') character.
-The dot ('.') and fraction are separated by a space (' ') character.
 
-Duration parameters are optional. 
-A fraction may be entered without a dot.
-The dot is invalid without a fraction.
+Note parameters are required.
+Duration parameters are optional.
+	A fraction may be entered without a dot.
+	A dot may not be entered without a fraction.
 
-Each note/duration pair occupies an entire line.
+Bar lines are denoted by a comma (',')
 
-Bar lines are denoted by a comma (','), also occupying one line.
+Refer to sample input file for more details.
 
 
 
@@ -48,3 +44,4 @@ q	1/4	q(uarter)
 e	1/8	e(ighth)
 s	1/16	s(ixteenth)
 t	1/32	t(hirtysecond)
+.	dot	increases note duration by half its value
