@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 public class Main {
 	static int stringNumber;
+	static boolean convert;
 
 	public static String barline(int n) {
 		String out = " \n";
@@ -14,99 +15,111 @@ public class Main {
 		return out;
 	}
 
-	public static String parseDuration(String duration) {
-		String[] s = duration.split("[/ ]");
-		String out = "";
-		out += 	s[1].equals("1") ? "w" : 
-			s[1].equals("2") ? "h" : 
-			s[1].equals("4") ? "q" : 
-			s[1].equals("8") ? "e" : 
-			s[1].equals("16") ? "s" : 
-			s[1].equals("32") ? "t" : " ";
-		out += (s.length > 2 && s[2].equals(".")) ? "." : " ";
+	public static String parseDuration(String str) {
+		String out = " ";
+		int number = Integer.parseInt(str.substring(str.indexOf("/") + 1).replace(".", ""));
+		switch (number) {
+			case 1: out += "w"; break;
+			case 2: out += "h"; break;
+			case 4: out += "q"; break;
+			case 8: out += "e"; break;
+			case 16: out += "s"; break;
+			case 32: out += "t"; break;
+		}
+		out += (str.charAt(str.length() - 1) == '.') ? "." : " ";
 		return out;
 	}
 
-	public static String block(String in) {
-		String out = "";
-		Pattern pattern = Pattern.compile("[0-9][a-p]");
+	public static String parseNotes(String in) {
+		String result = "";
+
+		Pattern pattern = Pattern.compile("[0-9][a-z]");
 		Matcher matcher = pattern.matcher(in);
-		ArrayList<String> toks = new ArrayList<String>();
+		ArrayList<String> pairs = new ArrayList<String>();
 		while (matcher.find()) {
-			toks.add(matcher.group());
+			pairs.add(matcher.group());
 		}
-		
-		out += " ";
-		String[] test = in.split("\t");
-		if (test.length > 1) {
-			out += parseDuration(test[1]);	
-		}
-		else {
-			out += "  ";
-		}
-		out += "\n";
 
 		for (int i = 0; i < stringNumber; i++) {
-			boolean empty = true;
-			for (String s : toks) {
-				if ((int) s.charAt(0) - '0' == i + 1) {
-					out += "-" + Integer.toString((int) s.charAt(1) - 'a') + "-\n";
-					empty = false;
+			boolean activeString = false;
+			for (String pair : pairs) {
+				if (i + 1 == (int) pair.charAt(0) - '0') {
+					activeString = true;
+					String fret = convert ? 
+						Integer.toString((int) pair.charAt(1) - 'a') : 
+						Character.toString(pair.charAt(1));
+					result += "-" + fret + "-\n";
 				}
 			}
-			if (empty) {
-				out += "---\n";
+			if (!activeString) {
+				result += "---\n";
 			}
 		}
-		return out;
+		return result;
 	}
 
-	public static String sum(String s1, String s2) {
-		String[] s1tok = s1.split("\n");
-		String[] s2tok = s2.split("\n");
-		String out = "";
-		for (int i = 0; i < s1tok.length; i++) {
-			if (i < s1tok.length) {
-				out += s1tok[i];
-			}
-			if (i < s2tok.length) {
-				out += s2tok[i];
-			}
-			out += "\n";
-		}
-		return out;
+	public static String tabColumn(String in) {
+		String[] params = in.split("\t");
+		String duration = (params.length > 1) ? parseDuration(params[1]) : "   ";
+		return duration + "\n" + parseNotes(in);
 	}
 
-	public static String separate(String s, int charLength) {
-		String[] toks = s.split("\n");
-		String out = "";
-		String rec = "";
-		if (toks[1].length() < charLength) {
-			return s;
+	public static String mergeTabs(String tab1, String tab2) {
+		String[] rows1 = tab1.split("\n");
+		String[] rows2 = tab2.split("\n");
+		String sum = "";
+		for (int i = 0; i < rows1.length; i++) {
+			if (i < rows1.length) {
+				sum += rows1[i];
+			}
+			if (i < rows2.length) {
+				sum += rows2[i];
+			}
+			sum += "\n";
 		}
-		int index = toks[1].indexOf("|", charLength);
-		for (String tok : toks) {
-			out += tok.substring(0, index + 1) + "\n";
-			rec += tok.substring(index) + "\n";
+		return sum;
+	}
+
+	public static String splitRows(String tab, int charLength) {
+		String[] rows = tab.split("\n");
+		String result = "", remaining = "";
+
+		if (rows[1].length() <= charLength) {
+			return tab;
 		}
-		out += "\n";
-		return out + separate(rec, charLength);
+
+		int index = rows[1].indexOf("|", charLength);
+		for (String row : rows) {
+			result += row.substring(0, index + 1) + "\n";
+			remaining += row.substring(index) + "\n";
+		}
+		result += "\n";
+
+		return result + splitRows(remaining, charLength);
 	}
 		
 	public static void main(String[] args) {
+		if (args.length > 0 && args[0].charAt(1) == 'c') {
+			convert = true;
+		} else {
+			convert = false;
+		}
+		
 		Scanner in = new Scanner(System.in);
+
 		stringNumber = Integer.parseInt(in.nextLine());
 		String barline = barline(stringNumber);
-		String total = barline;
+		String tab = barline;
+
 		while (in.hasNext()) {
 			String line = in.nextLine();
 			if (line.charAt(0) == ',') {
-				total = sum(total, barline);
+				tab = mergeTabs(tab, barline);
 			}
 			else {
-				total = sum(total, block(line));
-			};
+				tab = mergeTabs(tab, tabColumn(line));
+			}
 		}
-		System.out.println(separate(total, 80));
+		System.out.println(splitRows(tab, 70));
 	}
 }
