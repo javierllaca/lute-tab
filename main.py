@@ -9,9 +9,7 @@ def barline(n):
 def parseDuration(s):
 	map = {1:"w", 2:"h", 4:"q", 8:"e", 16:"s", 32:"t"}
 	number = int(s[s.index("/") + 1:].replace(".", ""))
-	duration = " " + map[number]
-	duration += "." if s[len(s) - 1] is '.' else " "
-	return duration
+	return " " + map[number] + ("." if s[len(s) - 1] is '.' else " ")
 
 def matchNumber(s, i):
 	matches = re.finditer("[0-9][a-z]", s)
@@ -32,8 +30,7 @@ def parseNotes(s):
 
 def tabColumn(s):
 	params = s.split("\t")
-	duration = parseDuration(params[1]) if len(params) > 1 else "   "
-	return duration + "\n" + parseNotes(s)
+	return (parseDuration(params[1]) if len(params) > 1 else "   ") + "\n" + parseNotes(s)
 
 def mergeTabs(tab1, tab2):
 	rows1 = tab1.split("\n")
@@ -48,9 +45,8 @@ def mergeTabs(tab1, tab2):
 	return sum.rstrip()
 
 def splitRows(tab, charLength):
+	result = remaining = ""
 	rows = tab.split("\n")
-	result = ""
-	remaining = ""
 	if len(rows[1]) < charLength:
 		return tab.rstrip()
 	index = rows[1][0:charLength].rfind('|')
